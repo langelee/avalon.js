@@ -1,0 +1,19 @@
+<body>
+<div ms-controller="wrap">{{a}}</div>
+<div ms-controller="wrap2">
+  {{a}}
+  <span>{{b}}</span>
+</div>
+<script type="text/javascript">
+  var abc = avalon.define({
+    $id: "wrap",
+    a: "你好啊"
+  });
+  var def = avalon.define({
+    $id: "wrap2",
+    a: "大家好",
+    b: abc.a   //获取第一个Model里的属性值
+  });
+  avalon.scan();
+</script>
+</body>
