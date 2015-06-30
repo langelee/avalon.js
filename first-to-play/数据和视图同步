@@ -1,0 +1,13 @@
+<body>
+<div ms-controller="wrap">
+  <span>{{a}}</span>
+  <input ms-duplex="a" />
+</div>
+<script type="text/javascript">
+  var abc = avalon.define({
+    $id: "wrap",
+    a: "你好啊"
+  });
+  avalon.scan();
+</script>
+</body>
