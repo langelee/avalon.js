@@ -1,0 +1,13 @@
+<body>
+<div ms-controller="wrap">{{a}}</div>
+<script type="text/javascript">
+  var abc = avalon.define({  //abc是随便起的一个名字，用作该Model的载体
+    $id: "wrap",   //告诉avalon这个Model是作用于哪个ms-controller的
+    a: "你好啊"   //定义一个avalon对象属性“a”，其值是“你好啊”
+  });
+  avalon.scan(); //要在最后加这一句，让avalon扫描文档，从而执行起来
+</script>
+</body>
+
+在avalon中，我们用 avalon.define({ ...  }) 的形式来定义一个Model实例（其参数可以看做一个avalon数据对象，
+其中的  $id  是内置属性，对应所要扫描和监控的控制域名。
