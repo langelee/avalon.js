@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<link href="../views-css/inner.css" type="text/css" rel="stylesheet"  >
+<meta name="format-detection" content="telephone=no"/>
+<title>创建微画钱包</title>
+<style>
+    *{
+        margin:0;
+        padding:0;
+    }
+    body,html{
+        height:100%;
+        width:100%;
+    }
+    body{
+        background-color: #f1f1f1;
+        /*overflow:hidden;*/
+    }
+    li{
+        width:100%;
+        height:50px;
+        line-height: 50px;
+        list-style: none;
+        margin-bottom: 10px;
+        background-color: #fff;
+    }
+    .txt{
+        float:left;
+        height:100%;
+        width:25%;
+        text-align: center;
+    }
+    ul.list li input{
+        float:right;
+        width:70%;
+        height:100%;
+        border:none;
+        outline:none;
+        font-size: 1rem;
+    }
+    p{
+        text-align: center;
+        line-height: 50px;
+        font-size: 1.2rem;
+    }
+    div.foot >div{
+        font-size: 1.2rem;
+        line-height:30px;
+        width:39%;
+        margin:5px 5%;
+        border-radius: 4px;
+        color:#fff;
+        border:none;
+        outline:none;
+        cursor: pointer;
+        float:left;
+        text-align: center;
+    }
+    div.submit{
+        background:#A80000;
+    }
+    div.clear{
+        background:#272822;
+    }
+</style>
+</head>
+<body ms-controller="MainController">
+    <div class="container">
+        <p>填写用户信息</p>
+        <ul class="list">
+            <li>
+                <div class="txt">密码</div>
+                <input type="password" placeholder="请输入大于6位小于15位的密码" ms-duplex="p_p" />
+            </li>
+            <li>
+                <div class="txt">重复密码</div>
+                <input type="password" placeholder="请重复密码" ms-duplex="p_p2"/>
+            </li>
+            <li>
+                <div class="txt">账户类型</div>
+                <input type="text" placeholder="支付宝或开户行" ms-duplex="p_out_type" />
+            </li>
+            <li>
+                <div class="txt">提现帐号</div>
+                <input type="text" placeholder="请输入提现帐号" ms-duplex="p_out_num" />
+            </li>
+            <li>
+                <div class="txt">真实姓名</div>
+                <input type="text" placeholder="此项为提现的重要依据" ms-duplex="p_out_name" />
+            </li>
+        </ul>
+        <div class="foot">
+            <div class="submit" ms-click="saveHandler" >提交</div>
+            <div class="clear" ms-click="clearHander" >清空</div>
+        </div>
+    </div>
+
+    <div class="wptAlert">
+        <div class="wptMask"></div>
+        <div class="dialog">
+            <div class="tip">
+                <div class="msg"></div>
+            </div>
+            <div class="btns">
+                <div class="btn-confirm">知道了</div>
+            </div>
+        </div>
+    </div>
+    <div class="wptConfirm">
+        <div class="wptMask"></div>
+        <div class="dialog">
+            <div class="tip">
+                <div class="msg"></div>
+            </div>
+            <div class="btns">
+                <div class="btn-confirm sure">确定</div>
+                <div class="btn-cancel">取消</div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript" src="../js/zepto.js"></script>
+<script type="text/javascript" src="../js/avalon.mobile.min.js"></script>
+<script type="text/javascript" src="../views-js/md5.js"></script>
+<script type="text/javascript" src="../views-js/wptTool.js"></script>
+<script>
+var user_id = localStorage.getItem("user_id");
+var hl_id = localStorage.getItem("hl_id");
+var mainCtr = avalon.define({
+    $id: 'MainController',
+    p_p: '',
+    p_p2: '',
+    p_out_type: '',
+    p_out_num: '',
+    p_out_name: '',
+
+    clearHander: function(){
+        mainCtr.p_p = '';
+        mainCtr.p_p2 = '';
+        mainCtr.p_out_type = '';
+        mainCtr.p_out_num = '';
+        mainCtr.p_out_name = '';
+    },
+    saveHandler: function(){
+        if (mainCtr.p_p==""||mainCtr.p_p2==""||mainCtr.p_out_type==""||mainCtr.p_out_num==""||mainCtr.p_out_name=="") {
+            wptAlert("请填写完所有信息");
+            return;
+        };
+        if (mainCtr.p_p!=mainCtr.p_p2) {
+            wptAlert("两次密码不相同");
+            mainCtr.p_p = "";
+            mainCtr.p_p2 = "";
+            return;
+        };
+        var mm = mainCtr.p_p.toString();
+        if (mm.length<6) {
+            wptAlert("密码不足6位");
+            return;
+        };
+        $(document).off('wptConfirm_view:sure').one('wptConfirm_view:sure', function () {
+            $.ajax({
+                crossDomain: true,
+                async: false, 
+                cache: false,
+                xhrFields: {
+                        withCredentials: true
+                },
+                type: 'POST',
+                url:'http://www.zgwhq8.com/svncheckout/repos/ci_culture/index.php/parse/parse_open',
+                data:{
+                    user_id: user_id,
+                    p_p: hex_md5(mainCtr.p_p),
+                    p_out_type: mainCtr.p_out_type,
+                    p_out_num: mainCtr.p_out_num,
+                    p_out_name: mainCtr.p_out_name
+                },
+                success: function(data){
+                    // alert(JSON.stringify(data));
+                    if (data.result) {
+                        alert(data.info);
+                    };
+                },
+                datatype: 'json'
+            })
+        });
+        wptConfirm('确认提交信息', {text: '确认', msgClass: 'smallFaq'});
+
+    }
+})
+
+avalon.scan();
+
+</script>
+</body>
+</html>
